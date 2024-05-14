@@ -21,7 +21,7 @@ class Var(object):
     LOG_CHANNEL = int(os.environ.get("LOG_CHANNEL", '-1001870015374'))
     PERMANENT_GROUP = os.environ.get("PERMANENT_GROUP", "-1002120533046")
     GROUP_ID = [int(ch) for ch in (os.environ.get("GROUP_ID", f"{PERMANENT_GROUP}")).split()]
-    FORCE_SUB   = os.environ.get("FORCE_SUB", "Hs_Botz")
+    FORCE_SUB   = os.environ.get("FORCE_SUB", "SK_MoviesOffl")
     PORT = int(getenv('PORT', "8282"))
     BIND_ADRESS = str(getenv('WEB_SERVER_BIND_ADDRESS', ''))
     PING_INTERVAL = int(environ.get("PING_INTERVAL", "1200"))  # 20 minutes
