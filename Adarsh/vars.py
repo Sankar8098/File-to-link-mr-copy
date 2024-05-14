@@ -23,7 +23,7 @@ class Var(object):
     GROUP_ID = [int(ch) for ch in (os.environ.get("GROUP_ID", f"{PERMANENT_GROUP}")).split()]
     FORCE_SUB   = os.environ.get("FORCE_SUB", "Hs_Botz")
     PORT = int(getenv('PORT', "8282"))
-    BIND_ADRESS = str(getenv('WEB_SERVER_BIND_ADDRESS', '167.172.134.62'))
+    BIND_ADRESS = str(getenv('WEB_SERVER_BIND_ADDRESS', ''))
     PING_INTERVAL = int(environ.get("PING_INTERVAL", "1200"))  # 20 minutes
     ADMIN = [int(admin) if id_pattern.search(admin) else admin for admin in os.environ.get('ADMIN', '1426588906').split()]
     OWNER_ID = set(int(x) for x in os.environ.get("OWNER_ID", "1426588906").split())  
