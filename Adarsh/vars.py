@@ -16,9 +16,9 @@ class Var(object):
     SLEEP_THRESHOLD = int(getenv('SLEEP_THRESHOLD', '60'))
     WORKERS = int(getenv('WORKERS', '4'))
     CUSTOM_FILE_CAPTION = environ.get("CUSTOM_FILE_CAPTION", "<b>ɴᴀᴍᴇ : {file_name}\n\nꜱɪᴢᴇ : {file_size}</b>")
-    BIN_CHANNEL = int(getenv('BIN_CHANNEL', "-1001968141372"))
+    BIN_CHANNEL = int(getenv('BIN_CHANNEL', "-1001682397310"))
     DELETE_PICS = (environ.get('DELETE_PICS', 'https://telegra.ph/file/f58fbfbf2774cc93f5e14.jpg')).split()
-    LOG_CHANNEL = int(os.environ.get("LOG_CHANNEL", '-1001445945237'))
+    LOG_CHANNEL = int(os.environ.get("LOG_CHANNEL", '-1001870015374'))
     PERMANENT_GROUP = os.environ.get("PERMANENT_GROUP", "-1001865323116")
     GROUP_ID = [int(ch) for ch in (os.environ.get("GROUP_ID", f"{PERMANENT_GROUP}")).split()]
     FORCE_SUB   = os.environ.get("FORCE_SUB", "Hs_Botz")
