@@ -26,7 +26,7 @@ class Var(object):
     BIND_ADRESS = str(getenv('WEB_SERVER_BIND_ADDRESS', ''))
     PING_INTERVAL = int(environ.get("PING_INTERVAL", "1200"))  # 20 minutes
     ADMIN = [int(admin) if id_pattern.search(admin) else admin for admin in os.environ.get('ADMIN', '1426588906').split()]
-    OWNER_ID = set(int(x) for x in os.environ.get("OWNER_ID", "1426588906").split())  
+    OWNER_ID = set(int(x) for x in os.environ.get("OWNER_ID", "5821871362").split())  
     NO_PORT = bool(getenv('NO_PORT', False))
     APP_NAME = str(getenv('APP_NAME'))
     OWNER_USERNAME = str(getenv('OWNER_USERNAME'))
