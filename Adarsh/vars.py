@@ -13,8 +13,8 @@ class Var(object):
     API_HASH = str(getenv('API_HASH', ""))
     BOT_TOKEN = str(getenv('BOT_TOKEN', ""))
     name = str(getenv('name', 'filetolinkbot'))
-    SLEEP_THRESHOLD = int(getenv('SLEEP_THRESHOLD', '60'))
-    WORKERS = int(getenv('WORKERS', '4'))
+    SLEEP_THRESHOLD = int(getenv('SLEEP_THRESHOLD', ''))
+    WORKERS = int(getenv('WORKERS', ''))
     CUSTOM_FILE_CAPTION = environ.get("CUSTOM_FILE_CAPTION", "<b>ɴᴀᴍᴇ : {file_name}\n\nꜱɪᴢᴇ : {file_size}</b>")
     BIN_CHANNEL = int(getenv('BIN_CHANNEL', "-1001682397310"))
     DELETE_PICS = (environ.get('DELETE_PICS', 'https://telegra.ph/file/f58fbfbf2774cc93f5e14.jpg')).split()
@@ -22,7 +22,7 @@ class Var(object):
     PERMANENT_GROUP = os.environ.get("PERMANENT_GROUP", "-1002120533046")
     GROUP_ID = [int(ch) for ch in (os.environ.get("GROUP_ID", f"{PERMANENT_GROUP}")).split()]
     FORCE_SUB   = os.environ.get("FORCE_SUB", "SK_MoviesOffl")
-    PORT = int(getenv('PORT', "8282"))
+    PORT = int(getenv('PORT', "8"))
     BIND_ADRESS = str(getenv('WEB_SERVER_BIND_ADDRESS', ''))
     PING_INTERVAL = int(environ.get("PING_INTERVAL", "11"))  # 20 minutes
     ADMIN = [int(admin) if id_pattern.search(admin) else admin for admin in os.environ.get('ADMIN', '1426588906').split()]
