@@ -13,7 +13,7 @@ class Var(object):
     API_HASH = str(getenv('API_HASH', ""))
     BOT_TOKEN = str(getenv('BOT_TOKEN', ""))
     name = str(getenv('name', 'filetolinkbot'))
-    SLEEP_THRESHOLD = int(getenv('SLEEP_THRESHOLD', ''))
+    SLEEP_THRESHOLD = int(getenv('SLEEP_THRESHOLD', '4'))
     WORKERS = int(getenv('WORKERS', ''))
     CUSTOM_FILE_CAPTION = environ.get("CUSTOM_FILE_CAPTION", "<b>ɴᴀᴍᴇ : {file_name}\n\nꜱɪᴢᴇ : {file_size}</b>")
     BIN_CHANNEL = int(getenv('BIN_CHANNEL', "-1001682397310"))
