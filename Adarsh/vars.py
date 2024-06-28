@@ -14,7 +14,7 @@ class Var(object):
     BOT_TOKEN = str(getenv('BOT_TOKEN', ""))
     name = str(getenv('name', 'filetolinkbot'))
     SLEEP_THRESHOLD = int(getenv('SLEEP_THRESHOLD', '4'))
-    WORKERS = int(getenv('WORKERS', ''))
+    WORKERS = int(getenv('WORKERS', '4'))
     CUSTOM_FILE_CAPTION = environ.get("CUSTOM_FILE_CAPTION", "<b>ɴᴀᴍᴇ : {file_name}\n\nꜱɪᴢᴇ : {file_size}</b>")
     BIN_CHANNEL = int(getenv('BIN_CHANNEL', "-1001682397310"))
     DELETE_PICS = (environ.get('DELETE_PICS', 'https://telegra.ph/file/f58fbfbf2774cc93f5e14.jpg')).split()
