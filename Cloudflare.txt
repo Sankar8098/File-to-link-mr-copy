@@ -15,3 +15,31 @@ async function handleRequest(request) {
 
   return fetch(newRequest);
 }
+
+
+addEventListener('fetch', event => {
+  event.respondWith(handleRequest(event.request));
+});
+
+async function handleRequest(request) {
+  const url = new URL(request.url);
+
+  // Check if the request URL matches the pattern for user link clicks
+  if (url.hostname === 'sai.skmoviesofficial.workers.dev') {
+    // Redirect to the Telegram channel
+    return Response.redirect('https://t.me/SK_MoviesOffl', 302);
+  }
+
+  // Otherwise, rewrite the hostname and proxy the request
+  url.hostname = 'file-streaming-bot-work.onrender.com';
+
+  const newRequest = new Request(url, {
+    method: request.method,
+    headers: request.headers,
+    body: request.method === 'POST' ? await request.text() : null,
+    redirect: 'follow',
+  });
+
+  return fetch(newRequest);
+}
+
