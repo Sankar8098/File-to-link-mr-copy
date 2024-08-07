@@ -1,77 +1,17 @@
 addEventListener('fetch', event => {
   event.respondWith(handleRequest(event.request))
-})
+});
 
 async function handleRequest(request) {
-  const url = new URL(request.url)
-  url.hostname = 'file-streaming-bot-work.onrender.com'
-
-  const init = {
-    method: request.method,
-    headers: request.headers,
-    redirect: 'follow'
-  }
-
-
-#sai.skmoviesofficial.workers.dev
-
-  // Only set the body for POST requests
-  if (request.method === 'POST') {
-    init.body = await request.text()
-  }
-
-  const newRequest = new Request(url, init)
-
-  return fetch(newRequest)
-}   https://sai.skmoviesofficial.workers.dev/
-
-
-addEventListener('fetch', event => {
-  event.respondWith(handleRequest(event.request))
-})
-
-async function handleRequest(request) {
-  const url = new URL(request.url)
-  url.hostname = 'theblackxyz-bots.onrender.com'
-
-  const init = {
-    method: request.method,
-    headers: request.headers,
-    redirect: 'follow'
-  }
-
-  // Only set the body for POST requests
-  if (request.method === 'POST') {
-    init.body = await request.text()
-  }
-
-  const newRequest = new Request(url, init)
-
-  // Directly fetch the new request
-  const response = await fetch(newRequest)
-
-  // Clone the response so that it can be used by both the caching logic and the return statement
-  const clonedResponse = response.clone()
-
-  return clonedResponse
-}
-
-
-
-addEventListener('fetch', event => {
-  event.respondWith(handleRequest(event.request))
-})
-
-async function handleRequest(request) {
-  const url = new URL(request.url)
-  url.hostname = 'theblackxyz-bots.onrender.com'
+  const url = new URL(request.url);
+  url.hostname = 'file-streaming-bot-work.onrender.com';
 
   const newRequest = new Request(url, {
-    method: request.method,
-    headers: request.headers,
-    body: request.method === 'POST' ? await request.text() : null,
-    redirect: 'follow',
-  })
+      method: request.method,
+      headers: request.headers,
+      body: request.method === 'POST' ? await request.text() : null,
+      redirect: 'follow',
+  });
 
-  return fetch(newRequest)
+  return fetch(newRequest);
 }
