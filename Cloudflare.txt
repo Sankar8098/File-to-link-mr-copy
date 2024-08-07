@@ -1,5 +1,5 @@
 addEventListener('fetch', event => {
-  event.respondWith(handleRequest(event.request))
+  event.respondWith(handleRequest(event.request));
 });
 
 async function handleRequest(request) {
@@ -7,10 +7,10 @@ async function handleRequest(request) {
   url.hostname = 'file-streaming-bot-work.onrender.com';
 
   const newRequest = new Request(url, {
-      method: request.method,
-      headers: request.headers,
-      body: request.method === 'POST' ? await request.text() : null,
-      redirect: 'follow',
+    method: request.method,
+    headers: request.headers,
+    body: request.method === 'POST' ? await request.text() : null,
+    redirect: 'follow',
   });
 
   return fetch(newRequest);
