@@ -2,12 +2,11 @@ import os
 import random
 import aiohttp
 import asyncio
-from asyncio import TimeoutError
 from urllib.parse import quote_plus
 import logging
 
-from pyrogram import filters, Client, enums
-from pyrogram.errors import FloodWait, UserNotParticipant
+from pyrogram import filters, Client
+from pyrogram.errors import FloodWait
 from pyrogram.types import Message, InlineKeyboardMarkup, InlineKeyboardButton, CallbackQuery
 from shortzy import Shortzy
 
@@ -122,22 +121,23 @@ async def private_receive_handler(c: Client, m: Message):
         await asyncio.sleep(2)
         await op.delete()
 
-        msg = await c.send_cached_media(
+        await c.send_cached_media(
             caption=caption,
             chat_id=m.chat.id,
             file_id=media.file_id
         )
         
         buttons = [[InlineKeyboardButton('⇇ ᴄʟᴏsᴇ ⇉', callback_data='close')]]
-        hs = k = await msg.reply(
+        await m.reply(
             "<b>❗⚠️❗🚨 ɪᴍᴘᴏʀᴛᴀɴᴛ 🚨❗⚠️❗️\n\n🎭 ᴛʜɪꜱ ᴍᴏᴠɪᴇ ғɪʟᴇ/ᴠɪᴅᴇᴏ ᴡɪʟʟ ʙᴇ ᴅᴇʟᴇᴛᴇᴅ ɪɴ <code>𝟷𝟶 ᴍɪɴᴜᴛᴇꜱ</code> ʙᴇᴄᴀᴜꜱᴇ ɪᴛꜱ ᴏᴠᴇʀ ᴜꜱᴀɢᴇ❗\n\n<b>ᴘʟᴇᴀꜱᴇ ꜰᴏʀᴡᴀʀᴅ/ꜱᴀᴠᴇ ᴛʜɪꜱ ᴍᴏᴠɪᴇ/ᴠɪᴅᴇᴏ ꜰɪʟᴇ ɪɴ ʏᴏᴜʀ ᴏᴡɴ ᴄʜᴀᴛ/ᴄʜᴀɴɴᴇʟ ᴀɴᴅ ᴛʜᴇɴ ꜱᴇɴᴅ ᴛʜᴇ ʟɪɴᴋ ᴛᴏ ʏᴏᴜʀ ᴍᴇᴍʙᴇʀꜱ🚀</b>",
             reply_markup=InlineKeyboardMarkup(buttons)
         )
-        await asyncio.sleep(600)
-        await m.delete()
-        await k.delete()
-        await msg.delete()
-        await log_msg.delete()
+        # Commented out the deletion lines
+        # await asyncio.sleep(600)
+        # await m.delete()
+        # await k.delete()
+        # await msg.delete()
+        # await log_msg.delete()
     except FloodWait as e:
         logging.error(f"FloodWait encountered: {str(e.x)}s")
         await asyncio.sleep(e.x)
@@ -180,4 +180,3 @@ async def close_button(c: Client, cb: CallbackQuery):
 
 if __name__ == "__main__":
     StreamBot.run()
-
