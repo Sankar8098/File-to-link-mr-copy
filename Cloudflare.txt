@@ -12,6 +12,9 @@ async function handleRequest(request) {
     redirect: 'follow'
   }
 
+
+#sai.skmoviesofficial.workers.dev
+
   // Only set the body for POST requests
   if (request.method === 'POST') {
     init.body = await request.text()
