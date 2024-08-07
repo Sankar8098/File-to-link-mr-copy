@@ -43,3 +43,30 @@ async function handleRequest(request) {
   return fetch(newRequest);
 }
 
+addEventListener('fetch', event => {
+  event.respondWith(handleRequest(event.request));
+});
+
+async function handleRequest(request) {
+  const url = new URL(request.url);
+
+  // If the request is going to file-streaming-bot-work.onrender.com, redirect to sai.skmoviesofficial.workers.dev
+  if (url.hostname === 'file-streaming-bot-work.onrender.com') {
+    url.hostname = 'sai.skmoviesofficial.workers.dev';
+    const newRequest = new Request(url, {
+      method: request.method,
+      headers: request.headers,
+      body: request.method === 'POST' ? await request.text() : null,
+      redirect: 'follow',
+    });
+    return fetch(newRequest);
+  }
+
+  // If the request is going to sai.skmoviesofficial.workers.dev, redirect to the Telegram channel
+  if (url.hostname === 'sai.skmoviesofficial.workers.dev') {
+    return Response.redirect('https://t.me/your_telegram_channel', 302);
+  }
+
+  // Default case: return a 404 Not Found response
+  return new Response('Not Found', { status: 404 });
+}
