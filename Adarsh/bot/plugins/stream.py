@@ -132,12 +132,6 @@ async def private_receive_handler(c: Client, m: Message):
             "<b>❗⚠️❗🚨 ɪᴍᴘᴏʀᴛᴀɴᴛ 🚨❗⚠️❗️\n\n🎭 ᴛʜɪꜱ ᴍᴏᴠɪᴇ ғɪʟᴇ/ᴠɪᴅᴇᴏ ᴡɪʟʟ ʙᴇ ᴅᴇʟᴇᴛᴇᴅ ɪɴ <code>𝟷𝟶 ᴍɪɴᴜᴛᴇꜱ</code> ʙᴇᴄᴀᴜꜱᴇ ɪᴛꜱ ᴏᴠᴇʀ ᴜꜱᴀɢᴇ❗\n\n<b>ᴘʟᴇᴀꜱᴇ ꜰᴏʀᴡᴀʀᴅ/ꜱᴀᴠᴇ ᴛʜɪꜱ ᴍᴏᴠɪᴇ/ᴠɪᴅᴇᴏ ꜰɪʟᴇ ɪɴ ʏᴏᴜʀ ᴏᴡɴ ᴄʜᴀᴛ/ᴄʜᴀɴɴᴇʟ ᴀɴᴅ ᴛʜᴇɴ ꜱᴇɴᴅ ᴛʜᴇ ʟɪɴᴋ ᴛᴏ ʏᴏᴜʀ ᴍᴇᴍʙᴇʀꜱ🚀</b>",
             reply_markup=InlineKeyboardMarkup(buttons)
         )
-        # Commented out the deletion lines
-        # await asyncio.sleep(600)
-        # await m.delete()
-        # await k.delete()
-        # await msg.delete()
-        # await log_msg.delete()
     except FloodWait as e:
         logging.error(f"FloodWait encountered: {str(e.x)}s")
         await asyncio.sleep(e.x)
@@ -180,3 +174,4 @@ async def close_button(c: Client, cb: CallbackQuery):
 
 if __name__ == "__main__":
     StreamBot.run()
+
