@@ -23,10 +23,7 @@ routes = web.RouteTableDef()
 
 @routes.get("/", allow_head=True)
 async def root_route_handler(request):
-    return web.json_response({
-        "message": '<a href="https://t.me/Noob_Developer_TN">Noob Developer</a>'
-    })
-
+    return web.json_response("SK Movies Official")
 
 @routes.get(r"/watch/{path:\S+}", allow_head=True)
 async def stream_handler(request: web.Request):
