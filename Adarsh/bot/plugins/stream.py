@@ -41,10 +41,8 @@ async def add_caption(c: Client, m: Message):
     caption = m.text.split(" ", 1)[1]
     await db.set_caption(m.from_user.id, caption=caption)
     buttons = [[InlineKeyboardButton('⇇ ᴄʟᴏsᴇ ⇉', callback_data='close')]]
-    h = await m.reply_sticker("CAACAgIAAxkBAAIBv2TgRm4xVkSMno1IJxfgM-zQSfSvAAIHCQAC-rI5SZwTbXRmStwTHgQ")
-    ok = await m.reply_text(f"<b>ʜᴇʏ {m.from_user.mention}\n\n✅ sᴜᴄᴄᴇꜱꜱғᴜʟʟʏ ᴀᴅᴅ ʏᴏᴜʀ ᴄᴀᴩᴛɪᴏɴ ᴀɴᴅ sᴀᴠᴇᴅ</b>", reply_markup=InlineKeyboardMarkup(buttons))
+    ok = await m.reply_text(f"<b>ʜᴇʏ {m.from_user.mention}\n\n✅ sᴜᴄᴄᴇꜱꜱғᴜʟʟʏ ᴀᴅᴅᴇᴅ ʏᴏᴜʀ ᴄᴀᴩᴛɪᴏɴ ᴀɴᴅ sᴀᴠᴇᴅ</b>", reply_markup=InlineKeyboardMarkup(buttons))
     await asyncio.sleep(5)
-    await h.delete()
     await ok.delete()
     await m.delete()
 
@@ -55,10 +53,8 @@ async def delete_caption(c: Client, m: Message):
         return await m.reply_text("__**😔 Yᴏᴜ Dᴏɴ'ᴛ Hᴀᴠᴇ Aɴy Cᴀᴩᴛɪᴏɴ**__")
     await db.set_caption(m.from_user.id, caption=None)
     buttons = [[InlineKeyboardButton('⇇ ᴄʟᴏsᴇ ⇉', callback_data='close')]]
-    uh = await m.reply_sticker("CAACAgIAAxkBAAIBv2TgRm4xVkSMno1IJxfgM-zQSfSvAAIHCQAC-rI5SZwTbXRmStwTHgQ")
     g = await m.reply_text(f"<b>ʜᴇʏ {m.from_user.mention}\n\n✅ sᴜᴄᴄᴇꜱꜱғᴜʟʟʏ ᴅᴇʟᴇᴛᴇᴅ ʏᴏᴜʀ ᴄᴀᴩᴛɪᴏɴ</b>", reply_markup=InlineKeyboardMarkup(buttons))
     await asyncio.sleep(5)
-    await uh.delete()
     await g.delete()
     await m.delete()
 
@@ -66,9 +62,9 @@ async def delete_caption(c: Client, m: Message):
 async def see_caption(c: Client, m: Message):
     caption = await db.get_caption(m.from_user.id)
     if caption:
-        await m.reply_text(f"**ʏᴏᴜ'ʀᴇ ᴄᴀᴩᴛɪᴏɴ:-**\n\n`{caption}`")
+        await m.reply_text(f"**ʏᴏᴜʀ ᴄᴀᴩᴛɪᴏɴ:-**\n\n`{caption}`")
     else:
-        await m.reply_text("__**😔 ʏᴏᴜ ᴅᴏɴ'ᴛ ʜᴀᴠᴇ ᴀɴʏ ᴄᴀᴩᴛɪᴏɴ**__")
+        await m.reply_text("__**😔 Yᴏᴜ Dᴏɴ'ᴛ Hᴀᴠᴇ Aɴy Cᴀᴩᴛɪᴏɴ**__")
 
 @StreamBot.on_message((filters.group) & (filters.document | filters.video | filters.audio | filters.photo), group=4)
 async def private_receive_handler(c: Client, m: Message):
@@ -117,10 +113,6 @@ async def private_receive_handler(c: Client, m: Message):
         else:
             caption = None
 
-        op = await m.reply_sticker("CAACAgIAAxkBAAIBvmTgRm76VICSvZ67FSwRmUwH2ogDAAJxCAAChJRBSW9oCRqmu85zHgQ")
-        await asyncio.sleep(2)
-        await op.delete()
-
         await c.send_cached_media(
             caption=caption,
             chat_id=m.chat.id,
@@ -166,12 +158,7 @@ async def close_button(c: Client, cb: CallbackQuery):
         await cb.message.reply_to_message.delete()
     except:
         pass
-    try:
-        await cb.message.reply_sticker.delete()
-    except:
-        pass
     await cb.answer()
 
 if __name__ == "__main__":
     StreamBot.run()
-
