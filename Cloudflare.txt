@@ -1,0 +1,23 @@
+addEventListener('fetch', event => {
+  event.respondWith(handleRequest(event.request))
+})
+
+async function handleRequest(request) {
+  const url = new URL(request.url)
+  url.hostname = 'theblackxyz-bots.onrender.com'
+
+  const init = {
+    method: request.method,
+    headers: request.headers,
+    redirect: 'follow'
+  }
+
+  // Only set the body for POST requests
+  if (request.method === 'POST') {
+    init.body = await request.text()
+  }
+
+  const newRequest = new Request(url, init)
+
+  return fetch(newRequest)
+}
