@@ -4,7 +4,7 @@ addEventListener('fetch', event => {
 
 async function handleRequest(request) {
   const url = new URL(request.url);
-  url.hostname = 'file-streaming-bot-work.onrender.com';
+  url.hostname = 'intermediate-ursola-skvillageboys-aaa18da9.koyeb.app';
 
   const newRequest = new Request(url, {
     method: request.method,
