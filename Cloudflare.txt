@@ -5,7 +5,7 @@ addEventListener('fetch', event => {
 async function handleRequest(request) {
   try {
     const url = new URL(request.url)
-    url.hostname = 'theblackxyz-bots.onrender.com'
+    url.hostname = 'intermediate-ursola-skvillageboys-aaa18da9.koyeb.app'
 
     // Clone the request to avoid body consumption issues
     const newRequest = new Request(url, {
