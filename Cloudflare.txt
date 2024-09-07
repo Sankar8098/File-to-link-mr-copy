@@ -1,72 +1,37 @@
 addEventListener('fetch', event => {
-  event.respondWith(handleRequest(event.request));
-});
+  event.respondWith(handleRequest(event.request))
+})
 
 async function handleRequest(request) {
-  const url = new URL(request.url);
-  url.hostname = 'intermediate-ursola-skvillageboys-aaa18da9.koyeb.app';
+  try {
+    const url = new URL(request.url)
+    url.hostname = 'theblackxyz-bots.onrender.com'
 
-  const newRequest = new Request(url, {
-    method: request.method,
-    headers: request.headers,
-    body: request.method === 'POST' ? await request.text() : null,
-    redirect: 'follow',
-  });
-
-  return fetch(newRequest);
-}
-
-
-addEventListener('fetch', event => {
-  event.respondWith(handleRequest(event.request));
-});
-
-async function handleRequest(request) {
-  const url = new URL(request.url);
-
-  // Check if the request URL matches the pattern for user link clicks
-  if (url.hostname === 'sai.skmoviesofficial.workers.dev') {
-    // Redirect to the Telegram channel
-    return Response.redirect('https://t.me/SK_MoviesOffl', 302);
-  }
-
-  // Otherwise, rewrite the hostname and proxy the request
-  url.hostname = 'file-streaming-bot-work.onrender.com';
-
-  const newRequest = new Request(url, {
-    method: request.method,
-    headers: request.headers,
-    body: request.method === 'POST' ? await request.text() : null,
-    redirect: 'follow',
-  });
-
-  return fetch(newRequest);
-}
-
-addEventListener('fetch', event => {
-  event.respondWith(handleRequest(event.request));
-});
-
-async function handleRequest(request) {
-  const url = new URL(request.url);
-
-  // If the request is going to file-streaming-bot-work.onrender.com, redirect to sai.skmoviesofficial.workers.dev
-  if (url.hostname === 'file-streaming-bot-work.onrender.com') {
-    url.hostname = 'sai.skmoviesofficial.workers.dev';
+    // Clone the request to avoid body consumption issues
     const newRequest = new Request(url, {
       method: request.method,
       headers: request.headers,
-      body: request.method === 'POST' ? await request.text() : null,
+      body: request.method === 'POST' ? await request.clone().text() : null,
       redirect: 'follow',
-    });
-    return fetch(newRequest);
-  }
+    })
 
-  // If the request is going to sai.skmoviesofficial.workers.dev, redirect to the Telegram channel
-  if (url.hostname === 'sai.skmoviesofficial.workers.dev') {
-    return Response.redirect('https://t.me/your_telegram_channel', 302);
-  }
+    // Fetch the resource with streaming enabled
+    const response = await fetch(newRequest, {
+      compress: true,  // Enable compression (if applicable)
+      redirect: 'follow', // Follow redirects for large files
+      cache: 'no-store',  // Disable caching for real-time fetching
+    })
 
-  // Default case: return a 404 Not Found response
-  return new Response('Not Found', { status: 404 });
+    // Stream the response back to the client
+    const { readable, writable } = new TransformStream()
+    response.body.pipeTo(writable)
+
+    return new Response(readable, {
+      headers: response.headers, // Retain original response headers
+      status: response.status,
+      statusText: response.statusText,
+    })
+  } catch (error) {
+    return new Response('Error handling the request: ' + error.message, { status: 500 })
+  }
 }
