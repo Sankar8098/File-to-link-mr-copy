@@ -23,49 +23,53 @@ pass_db = Database(Var.DATABASE_URL, "ag_passwords")
 MY_PASS = os.environ.get("MY_PASS", None)
 pass_dict = {}
 
-class temp(object):
+class TempVars:
     U_NAME = None
     B_NAME = None
 
 # Set up logging
 logging.basicConfig(level=logging.DEBUG)
 
+# Command to set caption
 @StreamBot.on_message(filters.group & filters.command('set_caption'))
 async def add_caption(c: Client, m: Message):
     if len(m.command) == 1:
         buttons = [[InlineKeyboardButton('⇇ ᴄʟᴏsᴇ ⇉', callback_data='close')]]
         return await m.reply_text(
-            "**ʜᴇʏ 👋\n\n<u>ɢɪᴠᴇ ᴛʜᴇ ᴄᴀᴩᴛɪᴏɴ</u>\n\nᴇxᴀᴍᴩʟᴇ:- `/set_caption <b>{file_name}\n\nSize : {file_size}\n\n➠ Fast Download Link :\n{download_link}\n\n➠ watch Download Link : {watch_link}\n\n☠️ Powered By : @OMGxLinks</b>`**",
+            "**ʜᴇʏ 👋\n\n<u>ɢɪᴠᴇ ᴛʜᴇ ᴄᴀᴩᴛɪᴏɴ</u>\n\nᴇxᴀᴍᴩʟᴇ:- `/set_caption <b>{file_name}\n\nSize : {file_size}\n\n➠ Fast Download Link :\n{download_link}\n\n➠ Watch Link : {watch_link}\n\n☠️ Powered By : @OMGxLinks</b>`**",
             reply_markup=InlineKeyboardMarkup(buttons)
         )
     caption = m.text.split(" ", 1)[1]
     await db.set_caption(m.from_user.id, caption=caption)
     buttons = [[InlineKeyboardButton('⇇ ᴄʟᴏsᴇ ⇉', callback_data='close')]]
-    ok = await m.reply_text(f"<b>ʜᴇʏ {m.from_user.mention}\n\n✅ sᴜᴄᴄᴇꜱꜱғᴜʟʟʏ ᴀᴅᴅᴇᴅ ʏᴏᴜʀ ᴄᴀᴩᴛɪᴏɴ ᴀɴᴅ sᴀᴠᴇᴅ</b>", reply_markup=InlineKeyboardMarkup(buttons))
+    ok = await m.reply_text(f"<b>ʜᴇʏ {m.from_user.mention}\n\n✅ Caption successfully added and saved</b>", reply_markup=InlineKeyboardMarkup(buttons))
     await asyncio.sleep(5)
     await ok.delete()
     await m.delete()
 
+# Command to delete caption
 @StreamBot.on_message(filters.group & filters.command('del_caption'))
 async def delete_caption(c: Client, m: Message):
     caption = await db.get_caption(m.from_user.id)
     if not caption:
-        return await m.reply_text("__**😔 Yᴏᴜ Dᴏɴ'ᴛ Hᴀᴠᴇ Aɴy Cᴀᴩᴛɪᴏɴ**__")
+        return await m.reply_text("__**😔 You don't have any caption**__")
     await db.set_caption(m.from_user.id, caption=None)
     buttons = [[InlineKeyboardButton('⇇ ᴄʟᴏsᴇ ⇉', callback_data='close')]]
-    g = await m.reply_text(f"<b>ʜᴇʏ {m.from_user.mention}\n\n✅ sᴜᴄᴄᴇꜱꜱғᴜʟʟʏ ᴅᴇʟᴇᴛᴇᴅ ʏᴏᴜʀ ᴄᴀᴩᴛɪᴏɴ</b>", reply_markup=InlineKeyboardMarkup(buttons))
+    g = await m.reply_text(f"<b>ʜᴇʏ {m.from_user.mention}\n\n✅ Caption successfully deleted</b>", reply_markup=InlineKeyboardMarkup(buttons))
     await asyncio.sleep(5)
     await g.delete()
     await m.delete()
 
+# Command to see/view caption
 @StreamBot.on_message(filters.group & filters.command(['see_caption', 'view_caption']))
 async def see_caption(c: Client, m: Message):
     caption = await db.get_caption(m.from_user.id)
     if caption:
-        await m.reply_text(f"**ʏᴏᴜʀ ᴄᴀᴩᴛɪᴏɴ:-**\n\n`{caption}`")
+        await m.reply_text(f"**Your caption:-**\n\n`{caption}`")
     else:
-        await m.reply_text("__**😔 Yᴏᴜ Dᴏɴ'ᴛ Hᴀᴠᴇ Aɴy Cᴀᴩᴛɪᴏɴ**__")
+        await m.reply_text("__**😔 You don't have any caption**__")
 
+# Handle media messages
 @StreamBot.on_message((filters.group) & (filters.document | filters.video | filters.audio | filters.photo), group=4)
 async def private_receive_handler(c: Client, m: Message):
     if str(m.chat.id).startswith("-100") and m.chat.id not in Var.GROUP_ID:
@@ -88,28 +92,20 @@ async def private_receive_handler(c: Client, m: Message):
         log_msg = await m.forward(chat_id=Var.BIN_CHANNEL)
         
         hs_stream_link = f"{Var.URL}watch/{str(log_msg.id)}/{quote_plus(get_name(log_msg))}?hash={get_hash(log_msg)}"
-        logging.debug(f"Generating short link for hs_stream_link: {hs_stream_link} and user: {user}")
         stream_link = await short_link(hs_stream_link, user)
-        logging.debug(f"Generated stream_link: {stream_link}")
 
         hs_online_link = f"{Var.URL}{str(log_msg.id)}/{quote_plus(get_name(log_msg))}?hash={get_hash(log_msg)}"
-        logging.debug(f"Generating short link for hs_online_link: {hs_online_link} and user: {user}")
         online_link = await short_link(hs_online_link, user)
-        logging.debug(f"Generated online_link: {online_link}")
 
         await log_msg.reply_text(
-            text=f"**RᴇQᴜᴇꜱᴛᴇᴅ ʙʏ :** [{m.from_user.first_name}](tg://user?id={m.from_user.id})\n**Uꜱᴇʀ ɪᴅ :** `{m.from_user.id}`\n**Stream ʟɪɴᴋ :** {stream_link}",
+            text=f"**Requested by :** [{m.from_user.first_name}](tg://user?id={m.from_user.id})\n**User ID :** `{m.from_user.id}`\n**Stream link :** {stream_link}",
             disable_web_page_preview=True,
             quote=True
         )
         
         c_caption = await db.get_caption(m.from_user.id)
         if c_caption:
-            try:
-                caption = c_caption.format(file_name='' if file_name is None else file_name, file_size=humanbytes(get_media_file_size(m)), download_link=online_link, watch_link=stream_link)
-            except Exception as e:
-                logging.error(f"Error formatting caption: {e}")
-                return
+            caption = c_caption.format(file_name=file_name, file_size=humanbytes(get_media_file_size(m)), download_link=online_link, watch_link=stream_link)
         else:
             caption = None
 
@@ -121,7 +117,7 @@ async def private_receive_handler(c: Client, m: Message):
         
         buttons = [[InlineKeyboardButton('⇇ ᴄʟᴏsᴇ ⇉', callback_data='close')]]
         await m.reply(
-            "<b>❗⚠️❗🚨 ɪᴍᴘᴏʀᴛᴀɴᴛ 🚨❗⚠️❗️\n\n🎭 ᴛʜɪꜱ ᴍᴏᴠɪᴇ ғɪʟᴇ/ᴠɪᴅᴇᴏ ᴡɪʟʟ ʙᴇ ᴅᴇʟᴇᴛᴇᴅ ɪɴ <code>𝟷𝟶 ᴍɪɴᴜᴛᴇꜱ</code> ʙᴇᴄᴀᴜꜱᴇ ɪᴛꜱ ᴏᴠᴇʀ ᴜꜱᴀɢᴇ❗\n\n<b>ᴘʟᴇᴀꜱᴇ ꜰᴏʀᴡᴀʀᴅ/ꜱᴀᴠᴇ ᴛʜɪꜱ ᴍᴏᴠɪᴇ/ᴠɪᴅᴇᴏ ꜰɪʟᴇ ɪɴ ʏᴏᴜʀ ᴏᴡɴ ᴄʜᴀᴛ/ᴄʜᴀɴɴᴇʟ ᴀɴᴅ ᴛʜᴇɴ ꜱᴇɴᴅ ᴛʜᴇ ʟɪɴᴋ ᴛᴏ ʏᴏᴜʀ ᴍᴇᴍʙᴇʀꜱ🚀</b>",
+            "<b>❗⚠️ Important Notice! This file will be deleted in 10 minutes due to overuse! Please forward/save it!</b>",
             reply_markup=InlineKeyboardMarkup(buttons)
         )
     except FloodWait as e:
@@ -129,14 +125,13 @@ async def private_receive_handler(c: Client, m: Message):
         await asyncio.sleep(e.x)
         await c.send_message(chat_id=Var.BIN_CHANNEL, text=f"Got FloodWait of {str(e.x)}s from [{m.from_user.first_name}](tg://user?id={m.from_user.id})\n\n**User ID :** `{str(m.from_user.id)}`", disable_web_page_preview=True)
 
+# Shorten link with optional user details
 async def short_link(link, user=None):
     if not user:
         return link
 
     api_key = user.get("shortner_api")
     base_site = user.get("shortner_url")
-
-    logging.debug(f"Shortening link: {link} with API: {api_key} and base_site: {base_site}")
 
     if bool(api_key and base_site) and Var.USERS_CAN_USE:
         shortzy = Shortzy(api_key, base_site)
@@ -151,6 +146,7 @@ async def short_link(link, user=None):
 
     return link
 
+# Callback handler for closing buttons
 @StreamBot.on_callback_query(filters.regex(r"^close$"))
 async def close_button(c: Client, cb: CallbackQuery):
     await cb.message.delete()
@@ -160,5 +156,7 @@ async def close_button(c: Client, cb: CallbackQuery):
         pass
     await cb.answer()
 
+# Run the bot
 if __name__ == "__main__":
     StreamBot.run()
+            
