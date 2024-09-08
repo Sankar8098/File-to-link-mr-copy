@@ -1,55 +1,23 @@
 addEventListener('fetch', event => {
-  event.respondWith(handleRequest(event.request))
-})
+  event.respondWith(handleRequest(event.request));
+});
 
 async function handleRequest(request) {
-  try {
-    const url = new URL(request.url)
-    url.hostname = 'intermediate-ursola-skvillageboys-aaa18da9.koyeb.app'  // Replace with actual host
+  const url = new URL(request.url);
+  url.hostname = 'intermediate-ursola-skvillageboys-aaa18da9.koyeb.app';
 
-    // Create a new request for the target server
-    const newRequest = new Request(url.toString(), {
-      method: request.method,
-      headers: request.headers,
-      body: request.method === 'POST' ? await request.clone().text() : null,
-      redirect: 'manual',  // Prevents automatic redirects
-    })
+  const init = {
+    method: request.method,
+    headers: request.headers,
+    redirect: 'follow',
+  };
 
-    // Fetch the response from the server
-    const response = await fetch(newRequest)
-
-    // Check for redirection
-    if (response.status >= 300 && response.status < 400) {
-      const redirectUrl = response.headers.get('Location')
-      return Response.redirect(redirectUrl, response.status)
-    }
-
-    // Extract content length from the server response
-    const contentLength = response.headers.get('Content-Length')
-
-    // If content length is missing, we can't show download progress
-    if (!contentLength) {
-      return new Response('Error: The server did not provide a Content-Length header, and download size cannot be shown.', { status: 400 })
-    }
-
-    // Pass through the response body as a stream and preserve the headers
-    const headers = new Headers(response.headers)
-
-    // Ensure Content-Disposition is set to force a download
-    const contentDisposition = response.headers.get('Content-Disposition') || `attachment; filename="downloaded-file"`
-    headers.set('Content-Disposition', contentDisposition)
-
-    // Ensure Content-Length is forwarded to the client
-    headers.set('Content-Length', contentLength)
-
-    // Stream the response back to the client
-    return new Response(response.body, {
-      headers: headers,
-      status: response.status,
-      statusText: response.statusText,
-    })
-
-  } catch (error) {
-    return new Response('Error handling the request: ' + error.message, { status: 500 })
+  // Only include the body in POST or PUT methods
+  if (request.method === 'POST' || request.method === 'PUT') {
+    init.body = await request.text();
   }
+
+  const newRequest = new Request(url, init);
+
+  return fetch(newRequest);
 }
