@@ -91,7 +91,7 @@ async def private_receive_handler(c: Client, m: Message):
 
     media = m.document or m.video or m.audio
     file_name = m.caption or ""
-    file_name = file_name.replace(".mkv", "").replace("HEVC", "#HEVC").replace("Sample video.", "#SampleVideo").replace(".", " ")
+    file_name = file_name.replace(".mkv", "").replace("HEVC", "#HEVC").replace("Sample video.", "#SampleVideo").replace("_", " ")
 
     try:
         user = await db.get_user(m.from_user.id)
