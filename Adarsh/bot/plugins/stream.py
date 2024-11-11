@@ -2,8 +2,8 @@ import os
 import random
 import aiohttp
 import asyncio
-import logging
 from urllib.parse import quote_plus
+import logging
 
 from pyrogram import filters, Client
 from pyrogram.errors import FloodWait
@@ -30,6 +30,26 @@ class TempVars:
 # Set up logging
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
+
+# Initialize the message queue
+message_queue = asyncio.Queue()
+
+# Background task to process messages sequentially
+async def process_messages():
+    while True:
+        c, m = await message_queue.get()
+        try:
+            await handle_media_message(c, m)
+        except Exception as e:
+            logger.error(f"Error in processing message {m.message_id}: {str(e)}")
+            await m.reply("❌ Failed to process your request due to an internal error.")
+        finally:
+            message_queue.task_done()
+
+# Start the background task when the bot starts
+@StreamBot.on_startup
+async def on_startup():
+    asyncio.create_task(process_messages())
 
 # Command to set caption
 @StreamBot.on_message(filters.group & filters.command('set_caption'))
@@ -74,11 +94,16 @@ async def see_caption(c: Client, m: Message):
     else:
         await m.reply_text("__**😔 You don't have any caption**__")
 
-# Handle media messages with order
+# Main message handler: enqueue messages for sequential processing
 @StreamBot.on_message(filters.group & (filters.document | filters.video | filters.audio | filters.photo), group=4)
-async def private_receive_handler(c: Client, m: Message):
+async def enqueue_message(c: Client, m: Message):
+    await message_queue.put((c, m))
+
+# Actual processing function for media messages
+async def handle_media_message(c: Client, m: Message):
     if str(m.chat.id).startswith("-100") and m.chat.id not in Var.GROUP_ID:
         return
+
     elif m.chat.id not in Var.GROUP_ID:
         if not await db.is_user_exist(m.from_user.id):
             await db.add_user(m.from_user.id)
@@ -88,7 +113,7 @@ async def private_receive_handler(c: Client, m: Message):
             )
             return
 
-    media = m.document or m.video or m.audio
+    media = m.document or m.video or m.audio or m.photo
     file_name = m.caption or ""
     file_name = file_name.replace(".mkv", "").replace("HEVC", "#HEVC").replace("Sample video.", "#SampleVideo").replace(",", " ")
 
@@ -108,7 +133,7 @@ async def private_receive_handler(c: Client, m: Message):
             disable_web_page_preview=True, quote=True
         )
 
-        # Ensure caption is in correct order
+        # Caption formatting
         c_caption = await db.get_caption(m.from_user.id)
         caption = None
         if c_caption:
@@ -127,10 +152,13 @@ async def private_receive_handler(c: Client, m: Message):
         )
 
         buttons = [[InlineKeyboardButton('⇇ ᴄʟᴏsᴇ ⇉', callback_data='close')]]
-        await m.reply(
+        notice_msg = await m.reply(
             "<b>❗⚠️ Important Notice! This file will be deleted in 10 minutes due to overuse! Please forward/save it!</b>",
             reply_markup=InlineKeyboardMarkup(buttons)
         )
+
+        # Schedule deletion of the notice message after 10 minutes
+        asyncio.create_task(delete_message_after(notice_msg, delay=600))  # 600 seconds = 10 minutes
 
     except FloodWait as e:
         logger.error(f"FloodWait encountered: {e.x} seconds.")
@@ -143,6 +171,14 @@ async def private_receive_handler(c: Client, m: Message):
     except Exception as e:
         logger.error(f"Error processing media message: {str(e)}")
         await m.reply("❌ Failed to process your request due to an internal error.")
+
+# Helper function to delete messages after a delay
+async def delete_message_after(message: Message, delay: int):
+    await asyncio.sleep(delay)
+    try:
+        await message.delete()
+    except Exception as e:
+        logger.warning(f"Failed to delete message {message.message_id}: {str(e)}")
 
 # Shorten link with optional user details
 async def short_link(link, user=None):
@@ -170,12 +206,13 @@ async def short_link(link, user=None):
 async def close_button(c: Client, cb: CallbackQuery):
     await cb.message.delete()
     try:
-        await cb.message.reply_to_message.delete()
-    except:
-        pass
+        if cb.message.reply_to_message:
+            await cb.message.reply_to_message.delete()
+    except Exception as e:
+        logger.warning(f"Failed to delete reply_to_message: {str(e)}")
     await cb.answer()
 
 # Run the bot
 if __name__ == "__main__":
     StreamBot.run()
-    
+                      
