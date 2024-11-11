@@ -2,8 +2,8 @@ import os
 import random
 import aiohttp
 import asyncio
-from urllib.parse import quote_plus
 import logging
+from urllib.parse import quote_plus
 
 from pyrogram import filters, Client
 from pyrogram.errors import FloodWait
@@ -74,12 +74,11 @@ async def see_caption(c: Client, m: Message):
     else:
         await m.reply_text("__**😔 You don't have any caption**__")
 
-# Handle media messages
+# Handle media messages with order
 @StreamBot.on_message(filters.group & (filters.document | filters.video | filters.audio | filters.photo), group=4)
 async def private_receive_handler(c: Client, m: Message):
     if str(m.chat.id).startswith("-100") and m.chat.id not in Var.GROUP_ID:
         return
-
     elif m.chat.id not in Var.GROUP_ID:
         if not await db.is_user_exist(m.from_user.id):
             await db.add_user(m.from_user.id)
@@ -109,7 +108,7 @@ async def private_receive_handler(c: Client, m: Message):
             disable_web_page_preview=True, quote=True
         )
 
-        # Caption formatting
+        # Ensure caption is in correct order
         c_caption = await db.get_caption(m.from_user.id)
         caption = None
         if c_caption:
@@ -120,7 +119,7 @@ async def private_receive_handler(c: Client, m: Message):
                 watch_link=stream_link
             )
 
-        # Send cached media with the caption
+        # Send cached media with the caption in order
         await c.send_cached_media(
             chat_id=m.chat.id,
             file_id=media.file_id,
@@ -179,3 +178,4 @@ async def close_button(c: Client, cb: CallbackQuery):
 # Run the bot
 if __name__ == "__main__":
     StreamBot.run()
+    
