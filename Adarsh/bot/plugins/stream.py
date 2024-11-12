@@ -46,7 +46,7 @@ async def process_messages():
         finally:
             message_queue.task_done()
 
-# Instead, start the background task in the main function
+# Start background task and client
 async def start_services():
     asyncio.create_task(process_messages())  # Start processing messages
     await StreamBot.start()  # Start the client
@@ -188,30 +188,24 @@ async def short_link(link, user=None):
     api_key = user.get("shortner_api")
     base_site = user.get("shortner_url")
 
+    # Check if shortener details are available and if shortening is allowed
     if api_key and base_site and Var.USERS_CAN_USE:
         shortzy = Shortzy(api_key, base_site)
         try:
+            # Attempt to shorten the link
             link = await shortzy.convert(link)
+            logger.debug(f"Shortened link: {link}")
         except aiohttp.ClientResponseError as e:
-            logger.error(f"ClientResponseError: {e.status}, message='{e.message}', url={e.request_info.url}")
+            # Log specific client response errors
+            logger.error(f"ClientResponseError: Status={e.status}, message='{e.message}', url={e.request_info.url}")
         except Exception as e:
-            logger.error(f"Unexpected error: {e}")
+            # Log any other unexpected errors
+            logger.error(f"Unexpected error in link shortening: {str(e)}")
         finally:
             return link
 
+    logger.warning("Shortener API or URL missing; returning original link.")
     return link
 
-# Callback handler for closing buttons
-@StreamBot.on_callback_query(filters.regex(r"^close$"))
-async def close_button(c: Client, cb: CallbackQuery):
-    await cb.message.delete()
-    try:
-        if cb.message.reply_to_message:
-            await cb.message.reply_to_message.delete()
-    except Exception as e:
-        logger.warning(f"Failed to delete reply_to_message: {str(e)}")
-    await cb.answer()
-
-# Run the bot
-if __name__ == "__main__":
-    StreamBot.run()
+# Run the start_services when bot starts
+StreamBot.run(start_services())
