@@ -1,17 +1,16 @@
-# Adarsh/__main__.py
 import asyncio
 import logging
+import sys
+import glob
+import importlib.util
+from pathlib import Path
+from aiohttp import web
 from pyrogram import idle
 from .bot import StreamBot
 from .vars import Var
-from aiohttp import web
 from .server import web_server
 from .utils.keepalive import ping_server
-from Adarsh.bot.clients import initialize_clients
-import importlib
-import sys
-import glob
-from pathlib import Path
+from .bot.clients import initialize_clients
 
 logging.basicConfig(
     level=logging.INFO,
@@ -20,11 +19,9 @@ logging.basicConfig(
 logging.getLogger("aiohttp").setLevel(logging.ERROR)
 logging.getLogger("pyrogram").setLevel(logging.ERROR)
 
-# Path to plugins
 ppath = "Adarsh/bot/plugins/*.py"
 files = glob.glob(ppath)
 
-# Initialize event loop
 loop = asyncio.get_event_loop()
 
 async def start_services():
@@ -73,4 +70,4 @@ if __name__ == "__main__":
         loop.run_until_complete(start_services())
     except KeyboardInterrupt:
         logging.info('----------------------- Service Stopped -----------------------')
-        
+    
