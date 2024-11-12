@@ -207,5 +207,6 @@ async def short_link(link, user=None):
     logger.warning("Shortener API or URL missing; returning original link.")
     return link
 
-# Run the start_services when bot starts
-StreamBot.run(start_services())
+# Run the bot
+if __name__ == "__main__":
+    StreamBot.run()
