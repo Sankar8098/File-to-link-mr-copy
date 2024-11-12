@@ -215,4 +215,3 @@ async def close_button(c: Client, cb: CallbackQuery):
 # Run the bot
 if __name__ == "__main__":
     StreamBot.run()
-                      
