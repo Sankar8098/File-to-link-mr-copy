@@ -46,10 +46,10 @@ async def process_messages():
         finally:
             message_queue.task_done()
 
-# Start the background task when the bot starts
-@StreamBot.on_startup
-async def on_startup():
-    asyncio.create_task(process_messages())
+# Instead, start the background task in the main function
+async def start_services():
+    asyncio.create_task(process_messages())  # Start processing messages
+    await StreamBot.start()  # Start the client
 
 # Command to set caption
 @StreamBot.on_message(filters.group & filters.command('set_caption'))
