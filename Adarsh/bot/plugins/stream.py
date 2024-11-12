@@ -18,8 +18,8 @@ from Adarsh.utils.file_properties import get_name, get_hash, get_media_file_size
 
 # Initialize databases
 db = Database(Var.DATABASE_URL, Var.name)
-pass_db = Database(Var.DATABASE_URL, "ag_passwords")
 
+# Check if the bot's environment variables are set
 MY_PASS = os.environ.get("MY_PASS", None)
 pass_dict = {}
 
@@ -27,37 +27,36 @@ class TempVars:
     U_NAME = None
     B_NAME = None
 
-# Set up logging
+# Set up logging for debugging
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
-# Initialize the message queue
+# Initialize message queue for sequential processing
 message_queue = asyncio.Queue()
 
-# Background task to process messages sequentially
 async def process_messages():
     while True:
         c, m = await message_queue.get()
         try:
             await handle_media_message(c, m)
         except Exception as e:
-            logger.error(f"Error in processing message {m.message_id}: {str(e)}")
+            logger.error(f"Error processing message {m.message_id}: {e}")
             await m.reply("❌ Failed to process your request due to an internal error.")
         finally:
             message_queue.task_done()
 
-# Start background task and client
+# Start message processing task and the bot
 async def start_services():
-    asyncio.create_task(process_messages())  # Start processing messages
-    await StreamBot.start()  # Start the client
+    asyncio.create_task(process_messages())
+    await StreamBot.start()
 
-# Command to set caption
+# Command to set a caption
 @StreamBot.on_message(filters.group & filters.command('set_caption'))
 async def add_caption(c: Client, m: Message):
     if len(m.command) == 1:
         buttons = [[InlineKeyboardButton('⇇ ᴄʟᴏsᴇ ⇉', callback_data='close')]]
         await m.reply_text(
-            "**ʜᴇʏ 👋\n\n<u>ɢɪᴠᴇ ᴛʜᴇ ᴄᴀᴩᴛɪᴏɴ</u>\n\nᴇxᴀᴍᴩʟᴇ:- `/set_caption <b>{file_name}\n\nSize : {file_size}\n\n➠ Fast Download Link :\n{download_link}\n\n➠ Watch Link : {watch_link}\n\n☠️ Powered By : @OMGxLinks</b>`**",
+            "**ʜᴇʏ 👋\n\n<u>Provide the caption</u>\n\nExample:- `/set_caption {file_name}\n\nSize : {file_size}\n\n➠ Download Link :\n{download_link}\n\n➠ Watch Link : {watch_link}\n\n☠️ Powered By : @OMGxLinks`**",
             reply_markup=InlineKeyboardMarkup(buttons)
         )
         return
@@ -65,12 +64,12 @@ async def add_caption(c: Client, m: Message):
     caption = m.text.split(" ", 1)[1]
     await db.set_caption(m.from_user.id, caption=caption)
     buttons = [[InlineKeyboardButton('⇇ ᴄʟᴏsᴇ ⇉', callback_data='close')]]
-    ok = await m.reply_text(f"<b>ʜᴇʏ {m.from_user.mention}\n\n✅ Caption successfully added and saved</b>", reply_markup=InlineKeyboardMarkup(buttons))
+    ok = await m.reply_text(f"<b>Hey {m.from_user.mention}\n\n✅ Caption saved successfully</b>", reply_markup=InlineKeyboardMarkup(buttons))
     await asyncio.sleep(5)
     await ok.delete()
     await m.delete()
 
-# Command to delete caption
+# Command to delete a caption
 @StreamBot.on_message(filters.group & filters.command('del_caption'))
 async def delete_caption(c: Client, m: Message):
     caption = await db.get_caption(m.from_user.id)
@@ -80,26 +79,26 @@ async def delete_caption(c: Client, m: Message):
 
     await db.set_caption(m.from_user.id, caption=None)
     buttons = [[InlineKeyboardButton('⇇ ᴄʟᴏsᴇ ⇉', callback_data='close')]]
-    g = await m.reply_text(f"<b>ʜᴇʏ {m.from_user.mention}\n\n✅ Caption successfully deleted</b>", reply_markup=InlineKeyboardMarkup(buttons))
+    g = await m.reply_text(f"<b>Hey {m.from_user.mention}\n\n✅ Caption deleted successfully</b>", reply_markup=InlineKeyboardMarkup(buttons))
     await asyncio.sleep(5)
     await g.delete()
     await m.delete()
 
-# Command to see/view caption
+# Command to see/view the current caption
 @StreamBot.on_message(filters.group & filters.command(['see_caption', 'view_caption']))
 async def see_caption(c: Client, m: Message):
     caption = await db.get_caption(m.from_user.id)
     if caption:
-        await m.reply_text(f"**Your caption:-**\n\n`{caption}`")
+        await m.reply_text(f"**Your caption:**\n\n`{caption}`")
     else:
         await m.reply_text("__**😔 You don't have any caption**__")
 
-# Main message handler: enqueue messages for sequential processing
+# Enqueue media messages for sequential processing
 @StreamBot.on_message(filters.group & (filters.document | filters.video | filters.audio | filters.photo), group=4)
 async def enqueue_message(c: Client, m: Message):
     await message_queue.put((c, m))
 
-# Actual processing function for media messages
+# Function to process media messages
 async def handle_media_message(c: Client, m: Message):
     if str(m.chat.id).startswith("-100") and m.chat.id not in Var.GROUP_ID:
         return
@@ -109,7 +108,7 @@ async def handle_media_message(c: Client, m: Message):
             await db.add_user(m.from_user.id)
             await c.send_message(
                 Var.BIN_CHANNEL,
-                f"New User Joined! : \n\n Name : [{m.from_user.first_name}](tg://user?id={m.from_user.id}) Started Your Bot!!"
+                f"New User Joined:\n\nName: [{m.from_user.first_name}](tg://user?id={m.from_user.id}) started your bot!"
             )
             return
 
@@ -129,11 +128,11 @@ async def handle_media_message(c: Client, m: Message):
         online_link = await short_link(hs_online_link, user)
 
         await log_msg.reply_text(
-            f"**Requested by :** [{m.from_user.first_name}](tg://user?id={m.from_user.id})\n**User ID :** `{m.from_user.id}`\n**Stream link :** {stream_link}",
+            f"**Requested by:** [{m.from_user.first_name}](tg://user?id={m.from_user.id})\n**User ID:** `{m.from_user.id}`\n**Stream link:** {stream_link}",
             disable_web_page_preview=True, quote=True
         )
 
-        # Caption formatting
+        # Retrieve and format caption
         c_caption = await db.get_caption(m.from_user.id)
         caption = None
         if c_caption:
@@ -144,43 +143,42 @@ async def handle_media_message(c: Client, m: Message):
                 watch_link=stream_link
             )
 
-        # Send cached media with the caption in order
+        # Send cached media with the formatted caption
         await c.send_cached_media(
             chat_id=m.chat.id,
             file_id=media.file_id,
             caption=caption
         )
 
+        # Schedule deletion notice message
         buttons = [[InlineKeyboardButton('⇇ ᴄʟᴏsᴇ ⇉', callback_data='close')]]
         notice_msg = await m.reply(
-            "<b>❗⚠️ Important Notice! This file will be deleted in 10 minutes due to overuse! Please forward/save it!</b>",
+            "<b>❗⚠️ Important: This file will be deleted in 10 minutes due to overuse! Please save it!</b>",
             reply_markup=InlineKeyboardMarkup(buttons)
         )
-
-        # Schedule deletion of the notice message after 10 minutes
-        asyncio.create_task(delete_message_after(notice_msg, delay=600))  # 600 seconds = 10 minutes
+        asyncio.create_task(delete_message_after(notice_msg, delay=600))
 
     except FloodWait as e:
-        logger.error(f"FloodWait encountered: {e.x} seconds.")
+        logger.error(f"FloodWait: {e.x} seconds.")
         await asyncio.sleep(e.x)
         await c.send_message(
             chat_id=Var.BIN_CHANNEL,
-            text=f"Got FloodWait of {e.x} seconds from [{m.from_user.first_name}](tg://user?id={m.from_user.id})\n\n**User ID :** `{m.from_user.id}`",
+            text=f"FloodWait of {e.x} seconds encountered from [{m.from_user.first_name}](tg://user?id={m.from_user.id})\n\n**User ID:** `{m.from_user.id}`",
             disable_web_page_preview=True
         )
     except Exception as e:
-        logger.error(f"Error processing media message: {str(e)}")
+        logger.error(f"Error processing media message: {e}")
         await m.reply("❌ Failed to process your request due to an internal error.")
 
-# Helper function to delete messages after a delay
+# Function to delete messages after a delay
 async def delete_message_after(message: Message, delay: int):
     await asyncio.sleep(delay)
     try:
         await message.delete()
     except Exception as e:
-        logger.warning(f"Failed to delete message {message.message_id}: {str(e)}")
+        logger.warning(f"Failed to delete message {message.message_id}: {e}")
 
-# Shorten link with optional user details
+# Shorten a link with optional user details
 async def short_link(link, user=None):
     if not user:
         return link
@@ -188,25 +186,33 @@ async def short_link(link, user=None):
     api_key = user.get("shortner_api")
     base_site = user.get("shortner_url")
 
-    # Check if shortener details are available and if shortening is allowed
+    # Check if the shortener details are available and shortening is enabled
     if api_key and base_site and Var.USERS_CAN_USE:
         shortzy = Shortzy(api_key, base_site)
         try:
-            # Attempt to shorten the link
             link = await shortzy.convert(link)
             logger.debug(f"Shortened link: {link}")
         except aiohttp.ClientResponseError as e:
-            # Log specific client response errors
             logger.error(f"ClientResponseError: Status={e.status}, message='{e.message}', url={e.request_info.url}")
         except Exception as e:
-            # Log any other unexpected errors
-            logger.error(f"Unexpected error in link shortening: {str(e)}")
-        finally:
-            return link
+            logger.error(f"Unexpected error in link shortening: {e}")
+        return link
 
     logger.warning("Shortener API or URL missing; returning original link.")
     return link
 
-# Run the bot
+# Callback handler for "close" buttons
+@StreamBot.on_callback_query(filters.regex(r"^close$"))
+async def close_button(c: Client, cb: CallbackQuery):
+    await cb.message.delete()
+    try:
+        if cb.message.reply_to_message:
+            await cb.message.reply_to_message.delete()
+    except Exception as e:
+        logger.warning(f"Failed to delete reply_to_message: {e}")
+    await cb.answer()
+
+# Run the bot with the start_services function
 if __name__ == "__main__":
-    StreamBot.run()
+    StreamBot.run(start_services())
+        
