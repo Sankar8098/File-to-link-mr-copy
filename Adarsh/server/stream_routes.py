@@ -150,12 +150,4 @@ async def media_streamer(request: web.Request, id: int, secure_hash: str):
         logging.error(f"Error in media_streamer: {e}")
         raise web.HTTPInternalServerError(text="An internal server error occurred.")
 
-# Application setup
-def setup_app():
-    app = web.Application()
-    app.router.add_routes(routes)
-    return app
-
-# Entry point
-
             
