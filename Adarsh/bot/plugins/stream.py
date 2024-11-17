@@ -147,23 +147,29 @@ async def private_receive_handler(c: Client, m: Message):
 
 # Shorten link with optional user details
 async def short_link(link, user=None):
-    if not user:
-        return link
-
-    api_key = user.get("shortner_api")
-    base_site = user.get("shortner_url")
-
-    if api_key and base_site and Var.USERS_CAN_USE:
-        shortzy = Shortzy(api_key, base_site)
+    retries = 3
+    while retries > 0:
         try:
-            link = await shortzy.convert(link)
-        except aiohttp.ClientResponseError as e:
-            logger.error(f"ClientResponseError: {e.status}, message='{e.message}', url={e.request_info.url}")
-        except Exception as e:
-            logger.error(f"Unexpected error: {e}")
-        finally:
-            return link
+            if not user:
+                return link
 
+            api_key = user.get("shortner_api")
+            base_site = user.get("shortner_url")
+
+            if api_key and base_site and Var.USERS_CAN_USE:
+                shortzy = Shortzy(api_key, base_site)
+                return await shortzy.convert(link)
+            return link
+        except aiohttp.ClientResponseError as e:
+            logger.error(f"Shortener Error: Status={e.status}, {await e.response.text()}")
+            if e.status in {429, 503}:
+                retries -= 1
+                await asyncio.sleep(2)
+            else:
+                break
+        except Exception as e:
+            logger.error(f"Unexpected error during shortening: {e}")
+            break
     return link
 
 # Callback handler for closing buttons
