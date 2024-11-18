@@ -42,7 +42,7 @@ class Var(object):
     if HAS_SSL:
         URL = "https://{}/".format(FQDN)
     else:
-        URL = "http://{}/".format(FQDN)
+        URL = "https://{}/".format(FQDN)
     USERS_CAN_USE = getenv('USERS_CAN_USE', True)
     DATABASE_URL = str(getenv('DATABASE_URL', "mongodb+srv://sankar:sankar@sankar.lldcdsx.mongodb.net/?retryWrites=true&w=majority"))
     UPDATES_CHANNEL = str(getenv('UPDATES_CHANNEL', None))
